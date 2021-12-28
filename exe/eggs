@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+require 'eggs'
+require 'rugged'
+require 'termios'
+
+def esc(c)
+  "\x1B#{c}"
+end
+
+
+def csi(c)
+  esc("[#{c}")
+end
+
+
+# print csi('2J')
+# print 'hep'
+# $stdin.getc
+
+orig_termios = Termios.tcgetattr($stdin)
+raw_termios = orig_termios.dup
+
+raw_termios.lflag &= ~(Termios::ECHO | Termios::ICANON | Termios::ISIG | Termios::IEXTEN)
+raw_termios.iflag &= ~(Termios::IXON | Termios::ICRNL | Termios::BRKINT | Termios::INPCK | Termios::ISTRIP)
+raw_termios.cflag |= Termios::CS8
+raw_termios.oflag &= ~(Termios::OPOST)
+raw_termios.cc[Termios::VTIME] = 0
+raw_termios.cc[Termios::VMIN] = 1
+
+Termios.tcsetattr($stdin, Termios::TCSAFLUSH, raw_termios)
+print esc('[?1049h')
+print esc('[H')
+
+at_exit do
+  Termios.tcsetattr($stdin, Termios::TCSAFLUSH, orig_termios)
+  print esc('[?1049l')
+  #print esc('[2J')
+  #print esc('[u')
+  print "\n"
+end
+
+loop do
+  c = $stdin.read(1)
+  print esc('[2J')
+  print esc('[H')
+
+  if c.ord < 32 || c.ord == 127
+    print "#{c.ord}"
+  else
+    print "#{c}"
+  end
+
+  break if c == 'q'
+end
+

@@ -1,0 +1,17 @@
+Metrics/LineLength:
+  Max: 120
+
+Metrics/ClassLength:
+  Max: 1500
+
+Style/HashSyntax:
+  EnforcedStyle: no_mixed_keys
+
+Layout/EmptyLineBetweenDefs:
+  NumberOfEmptyLines: 2
+
+Layout/EmptyLines:
+  Enabled: False
+
+Style/FrozenStringLiteralComment:
+  Enabled: False
